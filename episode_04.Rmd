@@ -9,7 +9,7 @@ editor_options:
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-Rの便利な特徴のひとつは、表形式のデータ（既に手元にあるようなスプレッドシートやCSVファイル）が扱えることです。 まず、 `data/` ディレクトリに保存した`gapminder_data_small.csv`を読み込んでみましょう。
+Rの便利な特徴のひとつは、表形式のデータ（既に手元にあるようなスプレッドシートやCSVファイル）が扱えることです。 まず、 `data/` ディレクトリに保存した`gapminder_data_small.csv`を読み込んでみましょう（[こちらからダウンロード出来ます](https://www.dropbox.com/s/yqe5e7kaxzc91xr/gapminder_data_small.csv?dl=0)）。
 
 ```{r load-gapminder}
 gapminder_small <- read.csv("data/gapminder_data_small.csv", stringsAsFactors = TRUE)
