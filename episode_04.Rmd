@@ -1,0 +1,67 @@
+---
+title: "データの構造"
+output: html_document
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Rの便利な特徴のひとつは、表形式のデータ（既に手元にあるようなスプレッドシートやCSVファイル）が扱えることです。 まず、 `data/` ディレクトリに保存した`gapminder_data_small.csv`を読み込んでみましょう。
+
+```{r load-gapminder}
+gapminder_small <- read.csv("data/gapminder_data_small.csv", stringsAsFactors = TRUE)
+gapminder_small
+```
+
+このデータはもう一つのデータファイル、`gapminder.csv`の一部に絞ったものです。まずこの小さなバージョンでRの基本的な操作に慣れてから、元の大きな方を使ってみます。
+
+read.csv関数は、CSVファイル（csv = comma-separated values）、つまり、 データの列が区読文字（コンマ）で分けられたテキストファイルを読み込みます。
+コンマはテキストファイルでデータを区切るために最も一般的に使われている句読文字です。 read.csvの他にもいくつかデータを読みこむ関数があります。 ひとつは、 データがタブで分けられているファイルのための read.delim です。もう一つは、今後紹介するtidyverseのread_csvです。必要があれば、 read.csv と read.delim、両方のデフォルトの句読記号を置き換えることができます。
+
+`stringsAsFactors`という引数は、データを読みこむ際に文字列の扱い方を設定します。`string`はプログラミングで「文字列」を指す言葉です。`Factor`は「因子」という意味で、因子についてはこの後もっと詳しく説明します。
+
+演算子 $ を使って列を指定し、列を切り出すことで、すぐにデータセットの探索を始めることができます：
+
+```{r gapminder-small-life-exp}
+gapminder_small$lifeExp # 大文字・小文字の区別に注意
+gapminder_small$country
+```
+
+列に他の操作をすることもできます：
+
+```{r gapminder-small-add}
+gapminder_small$year
+gapminder_small$year + 10
+```
+
+でも、こうしたらどうだろう
+
+```{r gapminder-small-add-error}
+gapminder_small$year + gapminder_small$country
+```
+
+## データ型
+
+最後のコマンドがエラーを返すのは 1952 足す "Afghanistan" はナンセンスだからだろうと思ったとしたら、 それは正解で、既にプログラミングにおけるデータ型という重要な概念をある程度分かっていると言えます。 データ型が何かを知るには、以下を使います：
+
+```{r gapminder-small-type}
+typeof(gapminder_small$year)
+```
+
+主な型は４つあります：double（浮動小数点型）、integer（整数型）、logical（論理型）、そしてcharacter（文字型）。
+
+```{r vec-types}
+typeof(3.14)
+typeof(1L) # Rはデフォルトでは浮動小数を使いますが、Lの接尾辞により、この数は整数型になります
+typeof(TRUE)
+typeof('banana') # 文字には「'」 でも「"」でも、どちら使ってもいいです
+```
+
+どんなに分析が複雑になっても、 Rにある全てのデータは、この基本データ型からなっています。
+
+上で読み込んだgapminderのデータ表は、data.frame（データフレーム）と呼ばれるもので、 data structure（データ構造）、つまりRの基本的なデータ型から構築されているものです。
+
+*data.frame*であることを確かめるには、class関数を使います：

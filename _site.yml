@@ -1,0 +1,9 @@
+name: "r-gapminder"
+output_dir: docs
+navbar:
+  title: "R によるデータ解析入門"
+  left:
+    - text: "ホーム"
+      href: index.html
+    - text: "4 データの構造"
+      href: episode_04.html
