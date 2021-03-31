@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+
+
+<title>データ型とベクトル</title>
+
+<script src="site_libs/header-attrs-2.7/header-attrs.js"></script>
+<script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/bootstrap.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<style>h1 {font-size: 34px;}
+       h1.title {font-size: 38px;}
+       h2 {font-size: 30px;}
+       h3 {font-size: 24px;}
+       h4 {font-size: 18px;}
+       h5 {font-size: 16px;}
+       h6 {font-size: 12px;}
+       code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
+       pre:not([class]) { background-color: white }</style>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/highlightjs-9.12.0/default.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+<style type="text/css">code{white-space: pre;}</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+
+
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+pre code {
+  padding: 0;
+}
+</style>
+
+
+<style type="text/css">
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #adb5bd;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script type="text/javascript">
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark it active
+  menuAnchor.tab('show');
+
+  // if it's got a parent navbar menu mark it active as well
+  menuAnchor.closest('li.dropdown').addClass('active');
+
+  // Navbar adjustments
+  var navHeight = $(".navbar").first().height() + 15;
+  var style = document.createElement('style');
+  var pt = "padding-top: " + navHeight + "px; ";
+  var mt = "margin-top: -" + navHeight + "px; ";
+  var css = "";
+  // offset scroll position for anchor links (for fixed navbar)
+  for (var i = 1; i <= 6; i++) {
+    css += ".section h" + i + "{ " + pt + mt + "}\n";
+  }
+  style.innerHTML = "body {" + pt + "padding-bottom: 40px; }\n" + css;
+  document.head.appendChild(style);
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "&#xe258;";
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">R によるデータ解析入門</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">ホーム</a>
+</li>
+<li>
+  <a href="episode_04.html">4 データの構造</a>
+</li>
+<li>
+  <a href="data_types_and_vectors.html">データ型とベクトル</a>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div id="header">
+
+
+
+<h1 class="title toc-ignore">データ型とベクトル</h1>
+
+</div>
+
+
+<p>始める前に、<code>gapminder</code> のデータを読み込んで内容を確認しましょう。</p>
+<pre class="r"><code>library(tidyverse)
+gapminder &lt;- read_csv(&#39;data/gapminder_data.csv&#39;)</code></pre>
+<pre><code>## 
+## ── Column specification ────────────────────────────────────────────────────────────────────────────
+## cols(
+##   country = col_character(),
+##   year = col_double(),
+##   pop = col_double(),
+##   continent = col_character(),
+##   lifeExp = col_double(),
+##   gdpPercap = col_double()
+## )</code></pre>
+<pre class="r"><code>gapminder</code></pre>
+<pre><code>## # A tibble: 1,704 x 6
+##    country      year      pop continent lifeExp gdpPercap
+##    &lt;chr&gt;       &lt;dbl&gt;    &lt;dbl&gt; &lt;chr&gt;       &lt;dbl&gt;     &lt;dbl&gt;
+##  1 Afghanistan  1952  8425333 Asia         28.8      779.
+##  2 Afghanistan  1957  9240934 Asia         30.3      821.
+##  3 Afghanistan  1962 10267083 Asia         32.0      853.
+##  4 Afghanistan  1967 11537966 Asia         34.0      836.
+##  5 Afghanistan  1972 13079460 Asia         36.1      740.
+##  6 Afghanistan  1977 14880372 Asia         38.4      786.
+##  7 Afghanistan  1982 12881816 Asia         39.9      978.
+##  8 Afghanistan  1987 13867957 Asia         40.8      852.
+##  9 Afghanistan  1992 16317921 Asia         41.7      649.
+## 10 Afghanistan  1997 22227415 Asia         41.8      635.
+## # … with 1,694 more rows</code></pre>
+<p>これで１７０４行、６列の行列を読み込むことができました。 ここで注目してもらいたいのが、列の名前の下にあるグレーの文字です。 これらは、各列のデータ型を表しています。</p>
+<div id="データ型" class="section level2">
+<h2>データ型</h2>
+<p>R には、大きく分けて３つのデータ型があります。 double（浮動小数点型）、logical（論理型）、そしてcharacter（文字型）です。 R 内のすべてのデータはこれら３つのデータ型で表すことができます。</p>
+<p>それでは各データ型の作り方とその特徴を見ていきましょう。</p>
+<div id="浮動小数点型" class="section level3">
+<h3>浮動小数点型</h3>
+<p>Rで使われる数字のほとんどはこのデータ型に当てはまります。 データ型をチェックするには<code>typeof()</code>関数を使います。 まずは浮動小数型の変数を作ってから、データ型をチェックしましょう：</p>
+<pre class="r"><code>cost &lt;- 23.50
+typeof(cost)</code></pre>
+<pre><code>## [1] &quot;double&quot;</code></pre>
+<p>これで、<code>cost</code>という変数には<code>double</code>、つまり浮動小数型のデータ型であることがわかります。</p>
+</div>
+<div id="文字型" class="section level3">
+<h3>文字型</h3>
+<p>次に、文字型というデータ型があります。 言葉通り、文字を表すデータ型です。 文字型のデータを作るには、単一引用符、もしくは二重引用符を使って文字を囲むと作ることができます。</p>
+<pre class="r"><code>fruit &lt;- &quot;apple&quot;
+typeof(fruit)</code></pre>
+<pre><code>## [1] &quot;character&quot;</code></pre>
+<pre class="r"><code>vegetable &lt;- &#39;potato&#39;
+typeof(vegetable)</code></pre>
+<pre><code>## [1] &quot;character&quot;</code></pre>
+<p>ここで注意してもらいたいのが、引用符を使わないで文字を入力すると、Rは自動的にその文字を変数、もしくは関数として認識してしまうことです。 入力した文字の変数・関数などがない場合は、エラーを出してしまいます。</p>
+<pre class="r"><code>drink &lt;- cola</code></pre>
+<pre><code>## Error in eval(expr, envir, enclos): object &#39;cola&#39; not found</code></pre>
+<p>もう一つ注意してもらいたいのが、「数字でも文字型にすることができる」という点です。 例えば、以下のように変数を作ってデータ型をチェックしてみましょう。</p>
+<pre class="r"><code>price &lt;- &quot;5.00&quot;
+typeof(price)</code></pre>
+<pre><code>## [1] &quot;character&quot;</code></pre>
+<p>つまり、引用符で囲んでしまえばどんなデータでも文字型にすることができてしまいます。 ここで気をつけないといけないのは、文字型のデータで計算をすることができないということです。 例えば、以下のような計算を文字型でする事はできません：</p>
+<pre class="r"><code>price &lt;- &quot;5.00&quot;
+price - 2</code></pre>
+<pre><code>## Error in price - 2: non-numeric argument to binary operator</code></pre>
+<p>何かしらの計算をする際にエラーが出た場合は、データ型をチェックしてみましょう。</p>
+</div>
+<div id="論理型" class="section level3">
+<h3>論理型</h3>
+<p>最後に論理型のデータを見てみましょう。 論理型のデータには２つの値しかありません：<code>TRUE</code>（YES・はい）か<code>FALSE</code>（NO・いいえ）。</p>
+<pre class="r"><code>yes &lt;- TRUE
+typeof(yes)</code></pre>
+<pre><code>## [1] &quot;logical&quot;</code></pre>
+<p>Rにはあらかじめ<code>TRUE</code>と<code>FALSE</code>の値が用意されているので、引用符なしで入力してもエラーを返しません。 逆に引用符で囲んでしまうと文字型になってしまうので注意してください。</p>
+<pre class="r"><code>no &lt;- &quot;FALSE&quot;
+typeof(no)</code></pre>
+<pre><code>## [1] &quot;character&quot;</code></pre>
+<p>直接入力して論理型を作ることもできるのですが、数値の比較をすることで論理型を作ることができます。 例えば、ある変数の数値が５０以上であるかどうかを確かめたいときに論理型を使えばそれを確かめることができます。</p>
+<pre class="r"><code>value &lt;- 75
+value &gt; 50</code></pre>
+<pre><code>## [1] TRUE</code></pre>
+<pre class="r"><code>value &lt;- 20
+value &gt; 50</code></pre>
+<pre><code>## [1] FALSE</code></pre>
+</div>
+<div id="データ型まとめ" class="section level3">
+<h3>データ型まとめ</h3>
+<p>長くなりましたが、これで<code>gapminder</code>の列名の下にある文字の意味が理解できるようになりました。 これらの文字は、各列にあるデータのデータ型を表していることがわかります。</p>
+</div>
+</div>
+<div id="ベクトル" class="section level2">
+<h2>ベクトル</h2>
+<p>Rでは、データの集合体のことをベクトルと呼んでいます。 今までは変数に一つしか値を記録させていなかったのですが、実は変数に複数の値を記録させることができます。 複数の値を<code>c()</code>という関数で一つの変数に記録させることでベクトルを作ることができます。 例えば、複数の身長を記録させるために<code>height</code>というベクトル変数を作ってみましょう。</p>
+<pre class="r"><code>height &lt;- c(145, 157, 163, 189)
+height</code></pre>
+<pre><code>## [1] 145 157 163 189</code></pre>
+<p>この<code>height</code>という変数には一つではなく、４つの数値が記録されていることがわかります。</p>
+<div id="ベクトルを使った計算" class="section level3">
+<h3>ベクトルを使った計算</h3>
+<p>ベクトルの大きな利点の一つが「各数値に同じ計算をすることができる」という点です。 例えば、先程の<code>height</code>変数にはセンチメートル基準の身長を記録させたのですが、メートル基準の身長に変えたい場合は以下のように指示を出します。</p>
+<pre class="r"><code>height_m &lt;- height / 100
+height_m</code></pre>
+<pre><code>## [1] 1.45 1.57 1.63 1.89</code></pre>
+<p>こういった計算はベクトル同士でもすることができます。 それでは、新たに<code>weight</code>という体重のベクトルを作り、先程の<code>height_m</code>変数を使って<code>bmi</code>を計算してみましょう。</p>
+<pre class="r"><code>weight &lt;- c(65, 45, 110, 90)
+bmi &lt;- weight / (height_m ^ 2)
+bmi</code></pre>
+<pre><code>## [1] 30.91558 18.25632 41.40163 25.19526</code></pre>
+<p>ここでは、<code>weight</code>と<code>height_m</code>変数に入っている各数値ごとに計算が施されているのがわかります。 このように、ベクトルを活用すれば複数の数値に対して同じ計算をすることができます。</p>
+</div>
+<div id="ベクトルからデータを抜く" class="section level3">
+<h3>ベクトルからデータを抜く</h3>
+<p>最後に、ベクトルから値を抜き出す方法を紹介します。 ベクトルの数値にはにはあらかじめ番号が割り振られています。 この番号を指定することで、ベクトルからその番号の値を抜き出すことができます。 ２つ目の値を抜き出したい場合は、以下のように指示します。</p>
+<pre class="r"><code>bmi[2]</code></pre>
+<pre><code>## [1] 18.25632</code></pre>
+<p>指定した番号がない場合は、<code>NA</code>（欠損値）が返ってきます。</p>
+<pre class="r"><code>bmi[50]</code></pre>
+<pre><code>## [1] NA</code></pre>
+<p>ある値を削除するにはマイナスを使います。</p>
+<pre class="r"><code>bmi[-2]</code></pre>
+<pre><code>## [1] 30.91558 41.40163 25.19526</code></pre>
+<p>更に、ベクトルを使って複数の値を抜き出すことも可能です。</p>
+<pre class="r"><code>bmi[c(2, 4)]</code></pre>
+<pre><code>## [1] 18.25632 25.19526</code></pre>
+<p>論理型を使って抜き出すことも可能です。</p>
+<pre class="r"><code>bmi[c(TRUE, FALSE, TRUE, TRUE)]</code></pre>
+<pre><code>## [1] 30.91558 41.40163 25.19526</code></pre>
+<p>論理型を使ったデータの抜き出し方を応用すれば、Rに数値を比較させて、その結果を使ってデータを抜き出すことができます。</p>
+<pre class="r"><code>bmi &gt; 30</code></pre>
+<pre><code>## [1]  TRUE FALSE  TRUE FALSE</code></pre>
+<pre class="r"><code>obese &lt;- bmi[bmi &gt; 30]
+obese</code></pre>
+<pre><code>## [1] 30.91558 41.40163</code></pre>
+</div>
+</div>
+
+
+
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.odd').parent('tbody').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open');
+  });
+});
+</script>
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
