@@ -37,7 +37,7 @@ gapminder
 ## データのプレビュー
 # View(gapminder)
 ```
-最も一般的なdplyr関数のいくつかを身に付けていきましょう。
+最も一般的なdplyrの関数のいくつかを身に付けていきましょう。
 
 - `select()`: 部分列の取得
 - `filter()`: 条件に基づく部分行の取得
@@ -131,3 +131,64 @@ result <- select(filter(gapselect, continent == "Asia", lifeExp > 40),
 ```
 
 これは便利ですが、ネストされている関数が多すぎると、Rが式を内から外に評価していくため(この場合はフィルタしてから選択する)、読みにくくなる可能性があります。
+
+最後のオプションであるパイプは、Rに最近追加されたものです。
+パイプを使用すると、ある関数の出力を取得して次の関数に直接送信できます。
+これは、同じデータセットに対して多くのことを行う必要がある場合に便利です。
+Rのパイプは `%>%` で、`magrittr`パッケージを介して利用可能になり、`dplyr`で自動的にインストールされます。
+RStudioを使用している場合は、PCなら Ctrl+Shift+m で、Macなら Cmd+Shift+m でパイプを入力できます。
+
+```{r pipe}
+gapminder %>%
+    filter(continent == "Asia", lifeExp > 40) %>%
+    select(country:lifeExp)
+```
+
+```
+# A tibble: 371 x 5
+   country      year      pop continent lifeExp
+   <chr>       <dbl>    <dbl> <chr>       <dbl>
+ 1 Afghanistan  1987 13867957 Asia         40.8
+ 2 Afghanistan  1992 16317921 Asia         41.7
+ 3 Afghanistan  1997 22227415 Asia         41.8
+ 4 Afghanistan  2002 25268405 Asia         42.1
+ 5 Afghanistan  2007 31889923 Asia         43.8
+ 6 Bahrain      1952   120447 Asia         50.9
+ 7 Bahrain      1957   138655 Asia         53.8
+ 8 Bahrain      1962   171863 Asia         56.9
+ 9 Bahrain      1967   202182 Asia         59.9
+10 Bahrain      1972   230800 Asia         63.3
+# ... with 361 more rows
+```
+
+上記のコードでは、パイプを使用して、最初に`filter()`を介して`gapminder`データセットを送りこみ、
+`continent`が"Asia"である行を保持し、次に`select()`を介して`country`列から`lifeExp`列までを保持します。
+`%>%`は左側のオブジェクトを受け取り、それを右側の関数の最初の引数として渡すため、
+`filter()`関数と`select()`関数の引数としてデータフレームを明示的に含める必要はありません。
+
+新しいオブジェクトを作成する場合は、新しい名前を割り当てます:
+
+```{r assign-new-name}
+result <- gapminder %>%
+    filter(continent == "Asia", lifeExp > 40) %>%
+    select(country:lifeExp)
+```
+
+```
+# A tibble: 371 x 5
+   country      year      pop continent lifeExp
+   <chr>       <dbl>    <dbl> <chr>       <dbl>
+ 1 Afghanistan  1987 13867957 Asia         40.8
+ 2 Afghanistan  1992 16317921 Asia         41.7
+ 3 Afghanistan  1997 22227415 Asia         41.8
+ 4 Afghanistan  2002 25268405 Asia         42.1
+ 5 Afghanistan  2007 31889923 Asia         43.8
+ 6 Bahrain      1952   120447 Asia         50.9
+ 7 Bahrain      1957   138655 Asia         53.8
+ 8 Bahrain      1962   171863 Asia         56.9
+ 9 Bahrain      1967   202182 Asia         59.9
+10 Bahrain      1972   230800 Asia         63.3
+# ... with 361 more rows
+```
+
+最後のデータフレーム(`result`)がこの式の左端の部分であることに注意してください。
