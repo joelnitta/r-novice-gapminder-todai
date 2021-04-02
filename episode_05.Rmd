@@ -192,3 +192,33 @@ result <- gapminder %>%
 ```
 
 最後のデータフレーム(`result`)がこの式の左端の部分であることに注意してください。
+
+## mutate関数
+
+多くの場合、たとえば、単位の変換を実行したり、2つの列の値の比率を見つけたりするために、
+既存の列の値に基づいて新しい列を作成する必要があります。
+このためには、`mutate()`を使用します。
+
+GDPが何十億円あるかに関心があるなら下記を実行します:
+
+```{r mutate}
+gapminder %>% 
+    mutate(gdp_billion = gdpPercap*pop/10^9)
+```
+
+```
+# A tibble: 1,704 x 7
+   country      year      pop continent lifeExp gdpPercap gdp_billion
+   <chr>       <dbl>    <dbl> <chr>       <dbl>     <dbl>       <dbl>
+ 1 Afghanistan  1952  8425333 Asia         28.8      779.        6.57
+ 2 Afghanistan  1957  9240934 Asia         30.3      821.        7.59
+ 3 Afghanistan  1962 10267083 Asia         32.0      853.        8.76
+ 4 Afghanistan  1967 11537966 Asia         34.0      836.        9.65
+ 5 Afghanistan  1972 13079460 Asia         36.1      740.        9.68
+ 6 Afghanistan  1977 14880372 Asia         38.4      786.       11.7 
+ 7 Afghanistan  1982 12881816 Asia         39.9      978.       12.6 
+ 8 Afghanistan  1987 13867957 Asia         40.8      852.       11.8 
+ 9 Afghanistan  1992 16317921 Asia         41.7      649.       10.6 
+10 Afghanistan  1997 22227415 Asia         41.8      635.       14.1 
+# ... with 1,694 more rows
+```
