@@ -9,3 +9,5 @@ navbar:
       href: episode_04.html
     - text: "データ型とベクトル"
       href: data_types_and_vectors.html
+    - text: "データの部分集合の取得"
+      href: episode_05.html
