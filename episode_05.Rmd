@@ -43,3 +43,66 @@ gapminder
 - `filter()`: 条件に基づく部分行の取得
 - `mutate()`: 既存列の情報を使用して新しい列を作成
 - `group_by()`と`summarize()`: グループ化されたデータの要約統計量を作成
+
+## 列のセレクトと行のフィルタリング
+
+データフレームの列を選択するには、`select()`を使用します。
+この関数の最初の引数はデータフレーム(`gapminder`)であり、
+後続の引数はコンマで区切られた持ち続ける列です。
+または、隣接する列を選択する場合は、`:`を使用して列の範囲を選択し、
+「__から__までの列を選択」と読み替えることができます。
+
+```{r select-gapminder}
+# county, year, pop 列をセレクトする
+select(gapminder, country, year, pop)
+# countryからlifeExpまでの一連の列を選択する
+select(gapminder, country:lifeExp)
+```
+
+特定の基準に基づいて行を選択するには、`filter()`関数を使用できます。
+データフレームの後の引数は、最終的なデータフレームが順守する条件です
+(たとえば、continent列の値がAsiaなど)。
+各条件の間にコンマを使用して、一連の条件を連鎖させることができます。
+
+```{r filter-gapminder-one-condition}
+# 1条件
+filter(gapminder, continent == "Asia")
+```
+
+```
+# A tibble: 396 x 6
+   country      year      pop continent lifeExp gdpPercap
+   <chr>       <dbl>    <dbl> <chr>       <dbl>     <dbl>
+ 1 Afghanistan  1952  8425333 Asia         28.8      779.
+ 2 Afghanistan  1957  9240934 Asia         30.3      821.
+ 3 Afghanistan  1962 10267083 Asia         32.0      853.
+ 4 Afghanistan  1967 11537966 Asia         34.0      836.
+ 5 Afghanistan  1972 13079460 Asia         36.1      740.
+ 6 Afghanistan  1977 14880372 Asia         38.4      786.
+ 7 Afghanistan  1982 12881816 Asia         39.9      978.
+ 8 Afghanistan  1987 13867957 Asia         40.8      852.
+ 9 Afghanistan  1992 16317921 Asia         41.7      649.
+10 Afghanistan  1997 22227415 Asia         41.8      635.
+# ... with 386 more rows
+```
+
+```{r filter-gapminder-multiple-conditions}
+filter(gapminder, continent == "Asia", lifeExp > 40)
+```
+
+```
+# A tibble: 371 x 6
+   country      year      pop continent lifeExp gdpPercap
+   <chr>       <dbl>    <dbl> <chr>       <dbl>     <dbl>
+ 1 Afghanistan  1987 13867957 Asia         40.8      852.
+ 2 Afghanistan  1992 16317921 Asia         41.7      649.
+ 3 Afghanistan  1997 22227415 Asia         41.8      635.
+ 4 Afghanistan  2002 25268405 Asia         42.1      727.
+ 5 Afghanistan  2007 31889923 Asia         43.8      975.
+ 6 Bahrain      1952   120447 Asia         50.9     9867.
+ 7 Bahrain      1957   138655 Asia         53.8    11636.
+ 8 Bahrain      1962   171863 Asia         56.9    12753.
+ 9 Bahrain      1967   202182 Asia         59.9    14805.
+10 Bahrain      1972   230800 Asia         63.3    18269.
+# ... with 361 more rows
+```
