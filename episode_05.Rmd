@@ -44,7 +44,7 @@ gapminder
 - `mutate()`: 既存列の情報を使用して新しい列を作成
 - `group_by()`と`summarize()`: グループ化されたデータの要約統計量を作成
 
-## 列のセレクトと行のフィルタリング
+## 列の選択と行のフィルタリング
 
 データフレームの列を選択するには、`select()`を使用します。
 この関数の最初の引数はデータフレーム(`gapminder`)であり、
@@ -106,3 +106,28 @@ filter(gapminder, continent == "Asia", lifeExp > 40)
 10 Bahrain      1972   230800 Asia         63.3    18269.
 # ... with 361 more rows
 ```
+
+## パイプ
+
+selectとfilterを同時に行いたい場合はどうなるでしょうか?
+これを行うには次の3つの方法があります: 中間ステップを使う、ネストされた関数を使う、またはパイプを使用する。
+
+中間ステップでは、一時的なデータフレームを作成し、次のように次の関数への入力として使用します:
+
+```{r intermediate-steps}
+gapselect <- select(gapminder, country:lifeExp)
+result <- filter(gapselect, continent == "Asia", lifeExp > 40)
+```
+
+これは読めますが、
+個別に名前を付ける必要があるオブジェクトが多くなり、ワークスペースが乱雑になる可能性があります。
+複数のステップがあると、それを追跡するのが難しくなりえます。
+
+次のように、関数をネストする(つまり、ある関数を別の関数の中に入れる)こともできます:
+
+```{r nest}
+result <- select(filter(gapselect, continent == "Asia", lifeExp > 40),
+                  country:lifeExp)
+```
+
+これは便利ですが、ネストされている関数が多すぎると、Rが式を内から外に評価していくため(この場合はフィルタしてから選択する)、読みにくくなる可能性があります。
