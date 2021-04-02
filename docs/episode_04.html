@@ -250,6 +250,9 @@ $(document).ready(function () {
 <li>
   <a href="data_types_and_vectors.html">データ型とベクトル</a>
 </li>
+<li>
+  <a href="episode_05.html">データの部分集合の取得</a>
+</li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
         
@@ -313,6 +316,20 @@ gapminder_small</code></pre>
 <p>どんなに分析が複雑になっても、 Rにある全てのデータは、この基本データ型からなっています。</p>
 <p>上で読み込んだgapminderのデータ表は、data.frame（データフレーム）と呼ばれるもので、 data structure（データ構造）、つまりRの基本的なデータ型から構築されているものです。</p>
 <p><em>data.frame</em>であることを確かめるには、class関数を使います：</p>
+<pre class="r"><code>class(gapminder_small)</code></pre>
+<pre><code>## [1] &quot;data.frame&quot;</code></pre>
+<p>データをうまくRで使うためには、基礎的なデータ構造、そしてその構造がどう作用するか を理解する必要があります。</p>
+</div>
+<div id="ベクトル及び型強制" class="section level2">
+<h2>ベクトル及び型強制</h2>
+<p>この動作をより理解するために、もう一つのデータ構造、<strong>ベクトル</strong>、を紹介します。ベクトルはc関数で作ることが出来ます。<code>c</code>は<code>concatenate</code>（繋げる、連結する）の初略です。要するに、いくつかの要素を連結することによって、ベクトルを作ることが出来ます。</p>
+<pre class="r"><code>my_vector &lt;- c(&quot;a&quot;, &quot;b&quot;, &quot;c&quot;)
+my_vector</code></pre>
+<pre><code>## [1] &quot;a&quot; &quot;b&quot; &quot;c&quot;</code></pre>
+<p>Rのベクトルは、本来、ベクトルの中の全てのものは同じ基本データ型でなければいけないという特別な条件のある、 順番を付けられたもののリストです。</p>
+<p>strを使えばベクトルかどうかを確かめられます：</p>
+<pre class="r"><code>str(my_vector)</code></pre>
+<pre><code>##  chr [1:3] &quot;a&quot; &quot;b&quot; &quot;c&quot;</code></pre>
 </div>
 
 
