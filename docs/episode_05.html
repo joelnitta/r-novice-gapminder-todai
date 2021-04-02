@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+
+
+<title>データの部分集合の取得</title>
+
+<script src="site_libs/header-attrs-2.7/header-attrs.js"></script>
+<script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/bootstrap.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<style>h1 {font-size: 34px;}
+       h1.title {font-size: 38px;}
+       h2 {font-size: 30px;}
+       h3 {font-size: 24px;}
+       h4 {font-size: 18px;}
+       h5 {font-size: 16px;}
+       h6 {font-size: 12px;}
+       code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
+       pre:not([class]) { background-color: white }</style>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/highlightjs-9.12.0/default.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+<style type="text/css">code{white-space: pre;}</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+
+
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+pre code {
+  padding: 0;
+}
+</style>
+
+
+<style type="text/css">
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #adb5bd;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script type="text/javascript">
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark it active
+  menuAnchor.tab('show');
+
+  // if it's got a parent navbar menu mark it active as well
+  menuAnchor.closest('li.dropdown').addClass('active');
+
+  // Navbar adjustments
+  var navHeight = $(".navbar").first().height() + 15;
+  var style = document.createElement('style');
+  var pt = "padding-top: " + navHeight + "px; ";
+  var mt = "margin-top: -" + navHeight + "px; ";
+  var css = "";
+  // offset scroll position for anchor links (for fixed navbar)
+  for (var i = 1; i <= 6; i++) {
+    css += ".section h" + i + "{ " + pt + mt + "}\n";
+  }
+  style.innerHTML = "body {" + pt + "padding-bottom: 40px; }\n" + css;
+  document.head.appendChild(style);
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "&#xe258;";
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">R によるデータ解析入門</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">ホーム</a>
+</li>
+<li>
+  <a href="episode_04.html">4 データの構造</a>
+</li>
+<li>
+  <a href="data_types_and_vectors.html">データ型とベクトル</a>
+</li>
+<li>
+  <a href="episode_05.html">データの部分集合の取得</a>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div id="header">
+
+
+
+<h1 class="title toc-ignore">データの部分集合の取得</h1>
+
+</div>
+
+
+<div id="問題" class="section level2">
+<h2>問題</h2>
+<ul>
+<li>データフレームから特定の行や列を選択するにはどうすればよいでしょうか？</li>
+<li>複数のコマンドを1つのコマンドに組み合わせるにはどうすればよいでしょうか？</li>
+<li>データフレームから新しい列を作成したり、既存の列を削除したりするにはどうすればよいでしょうか？</li>
+<li>ニーズに合わせてデータフレームを再フォーマットするにはどうすればよいでしょうか？</li>
+</ul>
+</div>
+<div id="目的" class="section level2">
+<h2>目的</h2>
+<ul>
+<li><code>dplyr</code>の<code>select</code>関数を使用して、データフレーム内の特定の列を選択します。</li>
+<li><code>dplyr</code>の<code>filter</code>関数のフィルタリング条件に従って、データフレーム内の特定の行を選択します。</li>
+<li>「パイプ」演算子を使用して、<code>dplyr</code>関数の出力を別の関数の入力にリンクします。</li>
+<li><code>mutate</code>を使用して、既存の列に何らかの関数を適用した新しい列をデータフレームに追加します。</li>
+<li><code>summarize</code>と<code>group_by</code>を使用して、データフレームを観測値(行)のグループ毎に分割し、各グループに要約統計を適用してから、結果を結合します。</li>
+</ul>
+</div>
+<div id="dplyrを身に付ける" class="section level2">
+<h2>dplyrを身に付ける</h2>
+<p>前にダウンロードしたgapminder_data.csvを読みこみます。</p>
+<pre class="r"><code>## tidyverseの読みこみ
+library(tidyverse)
+
+gapminder &lt;- read_csv(&quot;data/gapminder_data.csv&quot;)</code></pre>
+<pre><code>## 
+## ── Column specification ──────────────────────────────────────────────────────────
+## cols(
+##   country = col_character(),
+##   year = col_double(),
+##   pop = col_double(),
+##   continent = col_character(),
+##   lifeExp = col_double(),
+##   gdpPercap = col_double()
+## )</code></pre>
+<pre class="r"><code>## データの調査
+gapminder</code></pre>
+<pre><code>## # A tibble: 1,704 x 6
+##    country      year      pop continent lifeExp gdpPercap
+##    &lt;chr&gt;       &lt;dbl&gt;    &lt;dbl&gt; &lt;chr&gt;       &lt;dbl&gt;     &lt;dbl&gt;
+##  1 Afghanistan  1952  8425333 Asia         28.8      779.
+##  2 Afghanistan  1957  9240934 Asia         30.3      821.
+##  3 Afghanistan  1962 10267083 Asia         32.0      853.
+##  4 Afghanistan  1967 11537966 Asia         34.0      836.
+##  5 Afghanistan  1972 13079460 Asia         36.1      740.
+##  6 Afghanistan  1977 14880372 Asia         38.4      786.
+##  7 Afghanistan  1982 12881816 Asia         39.9      978.
+##  8 Afghanistan  1987 13867957 Asia         40.8      852.
+##  9 Afghanistan  1992 16317921 Asia         41.7      649.
+## 10 Afghanistan  1997 22227415 Asia         41.8      635.
+## # … with 1,694 more rows</code></pre>
+<pre class="r"><code>## データのプレビュー
+# View(gapminder)</code></pre>
+<p>最も一般的なdplyrの関数のいくつかを身に付けていきましょう。</p>
+<ul>
+<li><code>select()</code>: 部分列の取得</li>
+<li><code>filter()</code>: 条件に基づく部分行の取得</li>
+<li><code>mutate()</code>: 既存列の情報を使用して新しい列を作成</li>
+<li><code>group_by()</code>と<code>summarize()</code>: グループ化されたデータの要約統計量を作成</li>
+</ul>
+</div>
+<div id="列の選択と行のフィルタリング" class="section level2">
+<h2>列の選択と行のフィルタリング</h2>
+<p>データフレームの列を選択するには、<code>select()</code>を使用します。 この関数の最初の引数はデータフレーム(<code>gapminder</code>)であり、 後続の引数はコンマで区切られた持ち続ける列です。 または、隣接する列を選択する場合は、<code>:</code>を使用して列の範囲を選択し、 「__から__までの列を選択」と読み替えることができます。</p>
+<pre class="r"><code># county, year, pop 列をセレクトする
+select(gapminder, country, year, pop)</code></pre>
+<pre><code>## # A tibble: 1,704 x 3
+##    country      year      pop
+##    &lt;chr&gt;       &lt;dbl&gt;    &lt;dbl&gt;
+##  1 Afghanistan  1952  8425333
+##  2 Afghanistan  1957  9240934
+##  3 Afghanistan  1962 10267083
+##  4 Afghanistan  1967 11537966
+##  5 Afghanistan  1972 13079460
+##  6 Afghanistan  1977 14880372
+##  7 Afghanistan  1982 12881816
+##  8 Afghanistan  1987 13867957
+##  9 Afghanistan  1992 16317921
+## 10 Afghanistan  1997 22227415
+## # … with 1,694 more rows</code></pre>
+<pre class="r"><code># countryからlifeExpまでの一連の列を選択する
+select(gapminder, country:lifeExp)</code></pre>
+<pre><code>## # A tibble: 1,704 x 5
+##    country      year      pop continent lifeExp
+##    &lt;chr&gt;       &lt;dbl&gt;    &lt;dbl&gt; &lt;chr&gt;       &lt;dbl&gt;
+##  1 Afghanistan  1952  8425333 Asia         28.8
+##  2 Afghanistan  1957  9240934 Asia         30.3
+##  3 Afghanistan  1962 10267083 Asia         32.0
+##  4 Afghanistan  1967 11537966 Asia         34.0
+##  5 Afghanistan  1972 13079460 Asia         36.1
+##  6 Afghanistan  1977 14880372 Asia         38.4
+##  7 Afghanistan  1982 12881816 Asia         39.9
+##  8 Afghanistan  1987 13867957 Asia         40.8
+##  9 Afghanistan  1992 16317921 Asia         41.7
+## 10 Afghanistan  1997 22227415 Asia         41.8
+## # … with 1,694 more rows</code></pre>
+<p>特定の基準に基づいて行を選択するには、<code>filter()</code>関数を使用できます。 データフレームの後の引数は、最終的なデータフレームが順守する条件です (たとえば、continent列の値がAsiaなど)。 各条件の間にコンマを使用して、一連の条件を連鎖させることができます。</p>
+<pre class="r"><code># 1条件
+filter(gapminder, continent == &quot;Asia&quot;)</code></pre>
+<pre><code>## # A tibble: 396 x 6
+##    country      year      pop continent lifeExp gdpPercap
+##    &lt;chr&gt;       &lt;dbl&gt;    &lt;dbl&gt; &lt;chr&gt;       &lt;dbl&gt;     &lt;dbl&gt;
+##  1 Afghanistan  1952  8425333 Asia         28.8      779.
+##  2 Afghanistan  1957  9240934 Asia         30.3      821.
+##  3 Afghanistan  1962 10267083 Asia         32.0      853.
+##  4 Afghanistan  1967 11537966 Asia         34.0      836.
+##  5 Afghanistan  1972 13079460 Asia         36.1      740.
+##  6 Afghanistan  1977 14880372 Asia         38.4      786.
+##  7 Afghanistan  1982 12881816 Asia         39.9      978.
+##  8 Afghanistan  1987 13867957 Asia         40.8      852.
+##  9 Afghanistan  1992 16317921 Asia         41.7      649.
+## 10 Afghanistan  1997 22227415 Asia         41.8      635.
+## # … with 386 more rows</code></pre>
+<pre><code># A tibble: 396 x 6
+   country      year      pop continent lifeExp gdpPercap
+   &lt;chr&gt;       &lt;dbl&gt;    &lt;dbl&gt; &lt;chr&gt;       &lt;dbl&gt;     &lt;dbl&gt;
+ 1 Afghanistan  1952  8425333 Asia         28.8      779.
+ 2 Afghanistan  1957  9240934 Asia         30.3      821.
+ 3 Afghanistan  1962 10267083 Asia         32.0      853.
+ 4 Afghanistan  1967 11537966 Asia         34.0      836.
+ 5 Afghanistan  1972 13079460 Asia         36.1      740.
+ 6 Afghanistan  1977 14880372 Asia         38.4      786.
+ 7 Afghanistan  1982 12881816 Asia         39.9      978.
+ 8 Afghanistan  1987 13867957 Asia         40.8      852.
+ 9 Afghanistan  1992 16317921 Asia         41.7      649.
+10 Afghanistan  1997 22227415 Asia         41.8      635.
+# ... with 386 more rows</code></pre>
+<pre class="r"><code>filter(gapminder, continent == &quot;Asia&quot;, lifeExp &gt; 40)</code></pre>
+<pre><code>## # A tibble: 371 x 6
+##    country      year      pop continent lifeExp gdpPercap
+##    &lt;chr&gt;       &lt;dbl&gt;    &lt;dbl&gt; &lt;chr&gt;       &lt;dbl&gt;     &lt;dbl&gt;
+##  1 Afghanistan  1987 13867957 Asia         40.8      852.
+##  2 Afghanistan  1992 16317921 Asia         41.7      649.
+##  3 Afghanistan  1997 22227415 Asia         41.8      635.
+##  4 Afghanistan  2002 25268405 Asia         42.1      727.
+##  5 Afghanistan  2007 31889923 Asia         43.8      975.
+##  6 Bahrain      1952   120447 Asia         50.9     9867.
+##  7 Bahrain      1957   138655 Asia         53.8    11636.
+##  8 Bahrain      1962   171863 Asia         56.9    12753.
+##  9 Bahrain      1967   202182 Asia         59.9    14805.
+## 10 Bahrain      1972   230800 Asia         63.3    18269.
+## # … with 361 more rows</code></pre>
+<pre><code># A tibble: 371 x 6
+   country      year      pop continent lifeExp gdpPercap
+   &lt;chr&gt;       &lt;dbl&gt;    &lt;dbl&gt; &lt;chr&gt;       &lt;dbl&gt;     &lt;dbl&gt;
+ 1 Afghanistan  1987 13867957 Asia         40.8      852.
+ 2 Afghanistan  1992 16317921 Asia         41.7      649.
+ 3 Afghanistan  1997 22227415 Asia         41.8      635.
+ 4 Afghanistan  2002 25268405 Asia         42.1      727.
+ 5 Afghanistan  2007 31889923 Asia         43.8      975.
+ 6 Bahrain      1952   120447 Asia         50.9     9867.
+ 7 Bahrain      1957   138655 Asia         53.8    11636.
+ 8 Bahrain      1962   171863 Asia         56.9    12753.
+ 9 Bahrain      1967   202182 Asia         59.9    14805.
+10 Bahrain      1972   230800 Asia         63.3    18269.
+# ... with 361 more rows</code></pre>
+</div>
+<div id="パイプ" class="section level2">
+<h2>パイプ</h2>
+<p>selectとfilterを同時に行いたい場合はどうなるでしょうか? これを行うには次の3つの方法があります: 中間ステップを使う、ネストされた関数を使う、またはパイプを使用する。</p>
+<p>中間ステップでは、一時的なデータフレームを作成し、次のように次の関数への入力として使用します:</p>
+<pre class="r"><code>gapselect &lt;- select(gapminder, country:lifeExp)
+result &lt;- filter(gapselect, continent == &quot;Asia&quot;, lifeExp &gt; 40)</code></pre>
+<p>これは読めますが、 個別に名前を付ける必要があるオブジェクトが多くなり、ワークスペースが乱雑になる可能性があります。 複数のステップがあると、それを追跡するのが難しくなりえます。</p>
+<p>次のように、関数をネストする(つまり、ある関数を別の関数の中に入れる)こともできます:</p>
+<pre class="r"><code>result &lt;- select(filter(gapselect, continent == &quot;Asia&quot;, lifeExp &gt; 40),
+                  country:lifeExp)</code></pre>
+<p>これは便利ですが、ネストされている関数が多すぎると、Rが式を内から外に評価していくため(この場合はフィルタしてから選択する)、読みにくくなる可能性があります。</p>
+<p>最後のオプションであるパイプは、Rに最近追加されたものです。 パイプを使用すると、ある関数の出力を取得して次の関数に直接送信できます。 これは、同じデータセットに対して多くのことを行う必要がある場合に便利です。 Rのパイプは <code>%&gt;%</code> で、<code>magrittr</code>パッケージを介して利用可能になり、<code>dplyr</code>で自動的にインストールされます。 RStudioを使用している場合は、PCなら Ctrl+Shift+m で、Macなら Cmd+Shift+m でパイプを入力できます。</p>
+<pre class="r"><code>gapminder %&gt;%
+    filter(continent == &quot;Asia&quot;, lifeExp &gt; 40) %&gt;%
+    select(country:lifeExp)</code></pre>
+<pre><code>## # A tibble: 371 x 5
+##    country      year      pop continent lifeExp
+##    &lt;chr&gt;       &lt;dbl&gt;    &lt;dbl&gt; &lt;chr&gt;       &lt;dbl&gt;
+##  1 Afghanistan  1987 13867957 Asia         40.8
+##  2 Afghanistan  1992 16317921 Asia         41.7
+##  3 Afghanistan  1997 22227415 Asia         41.8
+##  4 Afghanistan  2002 25268405 Asia         42.1
+##  5 Afghanistan  2007 31889923 Asia         43.8
+##  6 Bahrain      1952   120447 Asia         50.9
+##  7 Bahrain      1957   138655 Asia         53.8
+##  8 Bahrain      1962   171863 Asia         56.9
+##  9 Bahrain      1967   202182 Asia         59.9
+## 10 Bahrain      1972   230800 Asia         63.3
+## # … with 361 more rows</code></pre>
+<pre><code># A tibble: 371 x 5
+   country      year      pop continent lifeExp
+   &lt;chr&gt;       &lt;dbl&gt;    &lt;dbl&gt; &lt;chr&gt;       &lt;dbl&gt;
+ 1 Afghanistan  1987 13867957 Asia         40.8
+ 2 Afghanistan  1992 16317921 Asia         41.7
+ 3 Afghanistan  1997 22227415 Asia         41.8
+ 4 Afghanistan  2002 25268405 Asia         42.1
+ 5 Afghanistan  2007 31889923 Asia         43.8
+ 6 Bahrain      1952   120447 Asia         50.9
+ 7 Bahrain      1957   138655 Asia         53.8
+ 8 Bahrain      1962   171863 Asia         56.9
+ 9 Bahrain      1967   202182 Asia         59.9
+10 Bahrain      1972   230800 Asia         63.3
+# ... with 361 more rows</code></pre>
+<p>上記のコードでは、パイプを使用して、最初に<code>filter()</code>を介して<code>gapminder</code>データセットを送りこみ、 <code>continent</code>が“Asia”である行を保持し、次に<code>select()</code>を介して<code>country</code>列から<code>lifeExp</code>列までを保持します。 <code>%&gt;%</code>は左側のオブジェクトを受け取り、それを右側の関数の最初の引数として渡すため、 <code>filter()</code>関数と<code>select()</code>関数の引数としてデータフレームを明示的に含める必要はありません。</p>
+<p>新しいオブジェクトを作成する場合は、新しい名前を割り当てます:</p>
+<pre class="r"><code>result &lt;- gapminder %&gt;%
+    filter(continent == &quot;Asia&quot;, lifeExp &gt; 40) %&gt;%
+    select(country:lifeExp)</code></pre>
+<pre><code># A tibble: 371 x 5
+   country      year      pop continent lifeExp
+   &lt;chr&gt;       &lt;dbl&gt;    &lt;dbl&gt; &lt;chr&gt;       &lt;dbl&gt;
+ 1 Afghanistan  1987 13867957 Asia         40.8
+ 2 Afghanistan  1992 16317921 Asia         41.7
+ 3 Afghanistan  1997 22227415 Asia         41.8
+ 4 Afghanistan  2002 25268405 Asia         42.1
+ 5 Afghanistan  2007 31889923 Asia         43.8
+ 6 Bahrain      1952   120447 Asia         50.9
+ 7 Bahrain      1957   138655 Asia         53.8
+ 8 Bahrain      1962   171863 Asia         56.9
+ 9 Bahrain      1967   202182 Asia         59.9
+10 Bahrain      1972   230800 Asia         63.3
+# ... with 361 more rows</code></pre>
+<p>最後のデータフレーム(<code>result</code>)がこの式の左端の部分であることに注意してください。</p>
+</div>
+<div id="mutate関数" class="section level2">
+<h2>mutate関数</h2>
+<p>多くの場合、たとえば、単位の変換を実行したり、2つの列の値の比率を見つけたりするために、 既存の列の値に基づいて新しい列を作成する必要があります。 このためには、<code>mutate()</code>を使用します。</p>
+<p>GDPが何十億円あるかに関心があるなら下記を実行します:</p>
+<pre class="r"><code>gapminder %&gt;% 
+    mutate(gdp_billion = gdpPercap*pop/10^9)</code></pre>
+<pre><code>## # A tibble: 1,704 x 7
+##    country      year      pop continent lifeExp gdpPercap gdp_billion
+##    &lt;chr&gt;       &lt;dbl&gt;    &lt;dbl&gt; &lt;chr&gt;       &lt;dbl&gt;     &lt;dbl&gt;       &lt;dbl&gt;
+##  1 Afghanistan  1952  8425333 Asia         28.8      779.        6.57
+##  2 Afghanistan  1957  9240934 Asia         30.3      821.        7.59
+##  3 Afghanistan  1962 10267083 Asia         32.0      853.        8.76
+##  4 Afghanistan  1967 11537966 Asia         34.0      836.        9.65
+##  5 Afghanistan  1972 13079460 Asia         36.1      740.        9.68
+##  6 Afghanistan  1977 14880372 Asia         38.4      786.       11.7 
+##  7 Afghanistan  1982 12881816 Asia         39.9      978.       12.6 
+##  8 Afghanistan  1987 13867957 Asia         40.8      852.       11.8 
+##  9 Afghanistan  1992 16317921 Asia         41.7      649.       10.6 
+## 10 Afghanistan  1997 22227415 Asia         41.8      635.       14.1 
+## # … with 1,694 more rows</code></pre>
+<pre><code># A tibble: 1,704 x 7
+   country      year      pop continent lifeExp gdpPercap gdp_billion
+   &lt;chr&gt;       &lt;dbl&gt;    &lt;dbl&gt; &lt;chr&gt;       &lt;dbl&gt;     &lt;dbl&gt;       &lt;dbl&gt;
+ 1 Afghanistan  1952  8425333 Asia         28.8      779.        6.57
+ 2 Afghanistan  1957  9240934 Asia         30.3      821.        7.59
+ 3 Afghanistan  1962 10267083 Asia         32.0      853.        8.76
+ 4 Afghanistan  1967 11537966 Asia         34.0      836.        9.65
+ 5 Afghanistan  1972 13079460 Asia         36.1      740.        9.68
+ 6 Afghanistan  1977 14880372 Asia         38.4      786.       11.7 
+ 7 Afghanistan  1982 12881816 Asia         39.9      978.       12.6 
+ 8 Afghanistan  1987 13867957 Asia         40.8      852.       11.8 
+ 9 Afghanistan  1992 16317921 Asia         41.7      649.       10.6 
+10 Afghanistan  1997 22227415 Asia         41.8      635.       14.1 
+# ... with 1,694 more rows</code></pre>
+</div>
+
+
+
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.odd').parent('tbody').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open');
+  });
+});
+</script>
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
