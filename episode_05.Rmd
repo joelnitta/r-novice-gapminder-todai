@@ -1,0 +1,224 @@
+---
+title: "データの部分集合の取得"
+output: html_document
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## 問題
+- データフレームから特定の行や列を選択するにはどうすればよいでしょうか？
+- 複数のコマンドを1つのコマンドに組み合わせるにはどうすればよいでしょうか？
+- データフレームから新しい列を作成したり、既存の列を削除したりするにはどうすればよいでしょうか？
+- ニーズに合わせてデータフレームを再フォーマットするにはどうすればよいでしょうか？
+
+## 目的
+- `dplyr`の`select`関数を使用して、データフレーム内の特定の列を選択します。
+- `dplyr`の`filter`関数のフィルタリング条件に従って、データフレーム内の特定の行を選択します。
+- 「パイプ」演算子を使用して、`dplyr`関数の出力を別の関数の入力にリンクします。
+- `mutate`を使用して、既存の列に何らかの関数を適用した新しい列をデータフレームに追加します。
+- `summarize`と`group_by`を使用して、データフレームを観測値(行)のグループ毎に分割し、各グループに要約統計を適用してから、結果を結合します。
+
+## dplyrを身に付ける
+
+前にダウンロードしたgapminder_data.csvを読みこみます。
+```{r load-gapminder}
+## tidyverseの読みこみ
+library(tidyverse)
+
+gapminder <- read_csv("data/gapminder_data.csv")
+
+## データの調査
+gapminder
+
+## データのプレビュー
+# View(gapminder)
+```
+最も一般的なdplyrの関数のいくつかを身に付けていきましょう。
+
+- `select()`: 部分列の取得
+- `filter()`: 条件に基づく部分行の取得
+- `mutate()`: 既存列の情報を使用して新しい列を作成
+- `group_by()`と`summarize()`: グループ化されたデータの要約統計量を作成
+
+## 列の選択と行のフィルタリング
+
+データフレームの列を選択するには、`select()`を使用します。
+この関数の最初の引数はデータフレーム(`gapminder`)であり、
+後続の引数はコンマで区切られた持ち続ける列です。
+または、隣接する列を選択する場合は、`:`を使用して列の範囲を選択し、
+「__から__までの列を選択」と読み替えることができます。
+
+```{r select-gapminder}
+# county, year, pop 列をセレクトする
+select(gapminder, country, year, pop)
+# countryからlifeExpまでの一連の列を選択する
+select(gapminder, country:lifeExp)
+```
+
+特定の基準に基づいて行を選択するには、`filter()`関数を使用できます。
+データフレームの後の引数は、最終的なデータフレームが順守する条件です
+(たとえば、continent列の値がAsiaなど)。
+各条件の間にコンマを使用して、一連の条件を連鎖させることができます。
+
+```{r filter-gapminder-one-condition}
+# 1条件
+filter(gapminder, continent == "Asia")
+```
+
+```
+# A tibble: 396 x 6
+   country      year      pop continent lifeExp gdpPercap
+   <chr>       <dbl>    <dbl> <chr>       <dbl>     <dbl>
+ 1 Afghanistan  1952  8425333 Asia         28.8      779.
+ 2 Afghanistan  1957  9240934 Asia         30.3      821.
+ 3 Afghanistan  1962 10267083 Asia         32.0      853.
+ 4 Afghanistan  1967 11537966 Asia         34.0      836.
+ 5 Afghanistan  1972 13079460 Asia         36.1      740.
+ 6 Afghanistan  1977 14880372 Asia         38.4      786.
+ 7 Afghanistan  1982 12881816 Asia         39.9      978.
+ 8 Afghanistan  1987 13867957 Asia         40.8      852.
+ 9 Afghanistan  1992 16317921 Asia         41.7      649.
+10 Afghanistan  1997 22227415 Asia         41.8      635.
+# ... with 386 more rows
+```
+
+```{r filter-gapminder-multiple-conditions}
+filter(gapminder, continent == "Asia", lifeExp > 40)
+```
+
+```
+# A tibble: 371 x 6
+   country      year      pop continent lifeExp gdpPercap
+   <chr>       <dbl>    <dbl> <chr>       <dbl>     <dbl>
+ 1 Afghanistan  1987 13867957 Asia         40.8      852.
+ 2 Afghanistan  1992 16317921 Asia         41.7      649.
+ 3 Afghanistan  1997 22227415 Asia         41.8      635.
+ 4 Afghanistan  2002 25268405 Asia         42.1      727.
+ 5 Afghanistan  2007 31889923 Asia         43.8      975.
+ 6 Bahrain      1952   120447 Asia         50.9     9867.
+ 7 Bahrain      1957   138655 Asia         53.8    11636.
+ 8 Bahrain      1962   171863 Asia         56.9    12753.
+ 9 Bahrain      1967   202182 Asia         59.9    14805.
+10 Bahrain      1972   230800 Asia         63.3    18269.
+# ... with 361 more rows
+```
+
+## パイプ
+
+selectとfilterを同時に行いたい場合はどうなるでしょうか?
+これを行うには次の3つの方法があります: 中間ステップを使う、ネストされた関数を使う、またはパイプを使用する。
+
+中間ステップでは、一時的なデータフレームを作成し、次のように次の関数への入力として使用します:
+
+```{r intermediate-steps}
+gapselect <- select(gapminder, country:lifeExp)
+result <- filter(gapselect, continent == "Asia", lifeExp > 40)
+```
+
+これは読めますが、
+個別に名前を付ける必要があるオブジェクトが多くなり、ワークスペースが乱雑になる可能性があります。
+複数のステップがあると、それを追跡するのが難しくなりえます。
+
+次のように、関数をネストする(つまり、ある関数を別の関数の中に入れる)こともできます:
+
+```{r nest}
+result <- select(filter(gapselect, continent == "Asia", lifeExp > 40),
+                  country:lifeExp)
+```
+
+これは便利ですが、ネストされている関数が多すぎると、Rが式を内から外に評価していくため(この場合はフィルタしてから選択する)、読みにくくなる可能性があります。
+
+最後のオプションであるパイプは、Rに最近追加されたものです。
+パイプを使用すると、ある関数の出力を取得して次の関数に直接送信できます。
+これは、同じデータセットに対して多くのことを行う必要がある場合に便利です。
+Rのパイプは `%>%` で、`magrittr`パッケージを介して利用可能になり、`dplyr`で自動的にインストールされます。
+RStudioを使用している場合は、PCなら Ctrl+Shift+m で、Macなら Cmd+Shift+m でパイプを入力できます。
+
+```{r pipe}
+gapminder %>%
+    filter(continent == "Asia", lifeExp > 40) %>%
+    select(country:lifeExp)
+```
+
+```
+# A tibble: 371 x 5
+   country      year      pop continent lifeExp
+   <chr>       <dbl>    <dbl> <chr>       <dbl>
+ 1 Afghanistan  1987 13867957 Asia         40.8
+ 2 Afghanistan  1992 16317921 Asia         41.7
+ 3 Afghanistan  1997 22227415 Asia         41.8
+ 4 Afghanistan  2002 25268405 Asia         42.1
+ 5 Afghanistan  2007 31889923 Asia         43.8
+ 6 Bahrain      1952   120447 Asia         50.9
+ 7 Bahrain      1957   138655 Asia         53.8
+ 8 Bahrain      1962   171863 Asia         56.9
+ 9 Bahrain      1967   202182 Asia         59.9
+10 Bahrain      1972   230800 Asia         63.3
+# ... with 361 more rows
+```
+
+上記のコードでは、パイプを使用して、最初に`filter()`を介して`gapminder`データセットを送りこみ、
+`continent`が"Asia"である行を保持し、次に`select()`を介して`country`列から`lifeExp`列までを保持します。
+`%>%`は左側のオブジェクトを受け取り、それを右側の関数の最初の引数として渡すため、
+`filter()`関数と`select()`関数の引数としてデータフレームを明示的に含める必要はありません。
+
+新しいオブジェクトを作成する場合は、新しい名前を割り当てます:
+
+```{r assign-new-name}
+result <- gapminder %>%
+    filter(continent == "Asia", lifeExp > 40) %>%
+    select(country:lifeExp)
+```
+
+```
+# A tibble: 371 x 5
+   country      year      pop continent lifeExp
+   <chr>       <dbl>    <dbl> <chr>       <dbl>
+ 1 Afghanistan  1987 13867957 Asia         40.8
+ 2 Afghanistan  1992 16317921 Asia         41.7
+ 3 Afghanistan  1997 22227415 Asia         41.8
+ 4 Afghanistan  2002 25268405 Asia         42.1
+ 5 Afghanistan  2007 31889923 Asia         43.8
+ 6 Bahrain      1952   120447 Asia         50.9
+ 7 Bahrain      1957   138655 Asia         53.8
+ 8 Bahrain      1962   171863 Asia         56.9
+ 9 Bahrain      1967   202182 Asia         59.9
+10 Bahrain      1972   230800 Asia         63.3
+# ... with 361 more rows
+```
+
+最後のデータフレーム(`result`)がこの式の左端の部分であることに注意してください。
+
+## mutate関数
+
+多くの場合、たとえば、単位の変換を実行したり、2つの列の値の比率を見つけたりするために、
+既存の列の値に基づいて新しい列を作成する必要があります。
+このためには、`mutate()`を使用します。
+
+GDPが何十億円あるかに関心があるなら下記を実行します:
+
+```{r mutate}
+gapminder %>% 
+    mutate(gdp_billion = gdpPercap*pop/10^9)
+```
+
+```
+# A tibble: 1,704 x 7
+   country      year      pop continent lifeExp gdpPercap gdp_billion
+   <chr>       <dbl>    <dbl> <chr>       <dbl>     <dbl>       <dbl>
+ 1 Afghanistan  1952  8425333 Asia         28.8      779.        6.57
+ 2 Afghanistan  1957  9240934 Asia         30.3      821.        7.59
+ 3 Afghanistan  1962 10267083 Asia         32.0      853.        8.76
+ 4 Afghanistan  1967 11537966 Asia         34.0      836.        9.65
+ 5 Afghanistan  1972 13079460 Asia         36.1      740.        9.68
+ 6 Afghanistan  1977 14880372 Asia         38.4      786.       11.7 
+ 7 Afghanistan  1982 12881816 Asia         39.9      978.       12.6 
+ 8 Afghanistan  1987 13867957 Asia         40.8      852.       11.8 
+ 9 Afghanistan  1992 16317921 Asia         41.7      649.       10.6 
+10 Afghanistan  1997 22227415 Asia         41.8      635.       14.1 
+# ... with 1,694 more rows
+```
