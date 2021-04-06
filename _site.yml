@@ -5,6 +5,8 @@ navbar:
   left:
     - text: "ホーム"
       href: index.html
+    - text: "関数"
+      href: functions.html
     - text: "データ型とベクトル"
       href: data_types_and_vectors.html
     - text: "データの部分集合の取得"

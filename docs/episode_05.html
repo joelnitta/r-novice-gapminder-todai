@@ -245,6 +245,9 @@ $(document).ready(function () {
   <a href="index.html">ホーム</a>
 </li>
 <li>
+  <a href="functions.html">関数</a>
+</li>
+<li>
   <a href="data_types_and_vectors.html">データ型とベクトル</a>
 </li>
 <li>
@@ -294,7 +297,7 @@ library(tidyverse)
 
 gapminder &lt;- read_csv(&quot;data/gapminder_data.csv&quot;)</code></pre>
 <pre><code>## 
-## ── Column specification ──────────────────────────────────────
+## ── Column specification ─────────────────────────────────────────────────────────
 ## cols(
 ##   country = col_character(),
 ##   year = col_double(),
@@ -440,20 +443,19 @@ result &lt;- filter(gapselect, continent == &quot;Asia&quot;, lifeExp &gt; 40)</
 <pre class="r"><code>gapminder %&gt;% 
     mutate(gdp_billion = gdpPercap*pop/10^9)</code></pre>
 <pre><code>## # A tibble: 1,704 x 7
-##    country      year      pop continent lifeExp gdpPercap
-##    &lt;chr&gt;       &lt;dbl&gt;    &lt;dbl&gt; &lt;chr&gt;       &lt;dbl&gt;     &lt;dbl&gt;
-##  1 Afghanistan  1952  8425333 Asia         28.8      779.
-##  2 Afghanistan  1957  9240934 Asia         30.3      821.
-##  3 Afghanistan  1962 10267083 Asia         32.0      853.
-##  4 Afghanistan  1967 11537966 Asia         34.0      836.
-##  5 Afghanistan  1972 13079460 Asia         36.1      740.
-##  6 Afghanistan  1977 14880372 Asia         38.4      786.
-##  7 Afghanistan  1982 12881816 Asia         39.9      978.
-##  8 Afghanistan  1987 13867957 Asia         40.8      852.
-##  9 Afghanistan  1992 16317921 Asia         41.7      649.
-## 10 Afghanistan  1997 22227415 Asia         41.8      635.
-## # … with 1,694 more rows, and 1 more variable:
-## #   gdp_billion &lt;dbl&gt;</code></pre>
+##    country      year      pop continent lifeExp gdpPercap gdp_billion
+##    &lt;chr&gt;       &lt;dbl&gt;    &lt;dbl&gt; &lt;chr&gt;       &lt;dbl&gt;     &lt;dbl&gt;       &lt;dbl&gt;
+##  1 Afghanistan  1952  8425333 Asia         28.8      779.        6.57
+##  2 Afghanistan  1957  9240934 Asia         30.3      821.        7.59
+##  3 Afghanistan  1962 10267083 Asia         32.0      853.        8.76
+##  4 Afghanistan  1967 11537966 Asia         34.0      836.        9.65
+##  5 Afghanistan  1972 13079460 Asia         36.1      740.        9.68
+##  6 Afghanistan  1977 14880372 Asia         38.4      786.       11.7 
+##  7 Afghanistan  1982 12881816 Asia         39.9      978.       12.6 
+##  8 Afghanistan  1987 13867957 Asia         40.8      852.       11.8 
+##  9 Afghanistan  1992 16317921 Asia         41.7      649.       10.6 
+## 10 Afghanistan  1997 22227415 Asia         41.8      635.       14.1 
+## # … with 1,694 more rows</code></pre>
 </div>
 
 
